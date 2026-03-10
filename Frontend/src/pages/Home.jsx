@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 import LoadingRing from "../components/LoadingRing";
 
 const Home = () => {
-  const { students, deleteStudent } = useContext(StudentContext);
+  const { students, deleteStudent,loading } = useContext(StudentContext);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [loadingTable, setLoadingTable] = useState(false); // table-level loading
   const navigate = useNavigate();
@@ -79,7 +79,7 @@ const Home = () => {
     },
   ];
 
-  return (
+  return loading && (
     <div className="p-4 max-w-7xl mx-auto relative">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
