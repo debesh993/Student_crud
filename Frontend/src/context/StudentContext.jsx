@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const StudentContext = createContext();
 
-const API_URL = "http://localhost:3000/students";
+const API_URL = "https://student-crud-backend-9aix.onrender.com/";
 
 export const StudentProvider = ({ children }) => {
   const [students, setStudents] = useState([]);
