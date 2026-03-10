@@ -6,7 +6,6 @@ import { toast } from "react-hot-toast";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
-// Spinner component
 const Spinner = ({ size = 60, color = "#6366f1" }) => (
   <div
     className="flex justify-center items-center"
@@ -42,14 +41,12 @@ const Home = () => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  // Filter students
   const filteredStudents = students.filter(
     (s) =>
       s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.email.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Excel export function
   const exportToExcel = (data, fileName) => {
     const formatted = data.map((s) => ({
       Name: s.name,
@@ -143,7 +140,6 @@ const Home = () => {
     },
   ];
 
-  // Show full-page spinner when initial data is loading
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen w-screen">
@@ -154,12 +150,10 @@ const Home = () => {
 
   return (
     <div className="p-4 max-w-7xl mx-auto relative">
-      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
         <h1 className="text-3xl font-bold">Students</h1>
 
         <div className="flex flex-wrap gap-3 items-center">
-          {/* Search */}
           <input
             type="text"
             placeholder="Search students..."
@@ -168,7 +162,6 @@ const Home = () => {
             className="border px-3 py-2 rounded-lg w-60 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
 
-          {/* Export All */}
           <button
             onClick={() => exportToExcel(students, "All_Students")}
             className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-600 transition"
@@ -176,7 +169,6 @@ const Home = () => {
             📊 Export All
           </button>
 
-          {/* Export Filtered */}
           <button
             onClick={() => exportToExcel(filteredStudents, "Filtered_Students")}
             className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 transition"
@@ -184,7 +176,6 @@ const Home = () => {
             🔎 Export Filtered
           </button>
 
-          {/* Add Student */}
           <button
             onClick={() => navigate("/add-student")}
             className="px-4 py-2 bg-purple-500 text-white font-semibold rounded hover:bg-purple-600 transition"
@@ -194,7 +185,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Table container */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden relative">
         {loadingTable && (
           <div className="absolute inset-0 bg-white bg-opacity-40 flex justify-center items-center z-50">
@@ -212,7 +202,6 @@ const Home = () => {
         />
       </div>
 
-      {/* Modal */}
       {selectedStudent && (
         <div
           className="fixed inset-0 backdrop-blur bg-opacity-50 flex justify-center items-center z-50"
