@@ -3,6 +3,8 @@ import DataTable from "react-data-table-component";
 import { StudentContext } from "../context/StudentContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 // Spinner component
 const Spinner = ({ size = 60, color = "#6366f1" }) => (
@@ -37,10 +39,45 @@ const Home = () => {
   const { students, deleteStudent, loading } = useContext(StudentContext);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [loadingTable, setLoadingTable] = useState(false);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
+  // Filter students
+  const filteredStudents = students.filter(
+    (s) =>
+      s.name.toLowerCase().includes(search.toLowerCase()) ||
+      s.email.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // Excel export function
+  const exportToExcel = (data, fileName) => {
+    const formatted = data.map((s) => ({
+      Name: s.name,
+      Email: s.email,
+      Age: s.age,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(formatted);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const file = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+
+    saveAs(file, `${fileName}.xlsx`);
+  };
+
   const handleDelete = async (id) => {
-    const confirmed = window.confirm("Are you sure you want to delete this student?");
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this student?"
+    );
     if (!confirmed) return;
 
     try {
@@ -118,14 +155,43 @@ const Home = () => {
   return (
     <div className="p-4 max-w-7xl mx-auto relative">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
         <h1 className="text-3xl font-bold">Students</h1>
-        <button
-          onClick={() => navigate("/add-student")}
-          className="px-4 py-2 bg-purple-500 text-white font-semibold rounded hover:bg-purple-600 transition"
-        >
-          + Add New Student
-        </button>
+
+        <div className="flex flex-wrap gap-3 items-center">
+          {/* Search */}
+          <input
+            type="text"
+            placeholder="Search students..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border px-3 py-2 rounded-lg w-60 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+
+          {/* Export All */}
+          <button
+            onClick={() => exportToExcel(students, "All_Students")}
+            className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-600 transition"
+          >
+            📊 Export All
+          </button>
+
+          {/* Export Filtered */}
+          <button
+            onClick={() => exportToExcel(filteredStudents, "Filtered_Students")}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 transition"
+          >
+            🔎 Export Filtered
+          </button>
+
+          {/* Add Student */}
+          <button
+            onClick={() => navigate("/add-student")}
+            className="px-4 py-2 bg-purple-500 text-white font-semibold rounded hover:bg-purple-600 transition"
+          >
+            + Add New Student
+          </button>
+        </div>
       </div>
 
       {/* Table container */}
@@ -135,9 +201,10 @@ const Home = () => {
             <Spinner size={60} color="#ef4444" />
           </div>
         )}
+
         <DataTable
           columns={columns}
-          data={students}
+          data={filteredStudents}
           pagination
           highlightOnHover
           responsive
@@ -161,14 +228,19 @@ const Home = () => {
             >
               &times;
             </button>
+
             <h2 className="text-2xl font-semibold mb-4">Student Details</h2>
+
             <div className="space-y-2">
               <p>
                 <span className="font-bold">Name:</span> {selectedStudent.name}
               </p>
+
               <p>
-                <span className="font-bold">Email:</span> {selectedStudent.email}
+                <span className="font-bold">Email:</span>{" "}
+                {selectedStudent.email}
               </p>
+
               <p>
                 <span className="font-bold">Age:</span> {selectedStudent.age}
               </p>
