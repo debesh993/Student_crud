@@ -3,12 +3,40 @@ import DataTable from "react-data-table-component";
 import { StudentContext } from "../context/StudentContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import LoadingRing from "../components/LoadingRing";
+
+// Spinner component
+const Spinner = ({ size = 60, color = "#6366f1" }) => (
+  <div
+    className="flex justify-center items-center"
+    style={{ height: size, width: size }}
+  >
+    <svg
+      className="animate-spin"
+      style={{ height: size, width: size }}
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke={color}
+        strokeWidth="4"
+        fill="none"
+      />
+      <path
+        className="opacity-75"
+        fill={color}
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      />
+    </svg>
+  </div>
+);
 
 const Home = () => {
-  const { students, deleteStudent,loading } = useContext(StudentContext);
+  const { students, deleteStudent, loading } = useContext(StudentContext);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [loadingTable, setLoadingTable] = useState(false); // table-level loading
+  const [loadingTable, setLoadingTable] = useState(false);
   const navigate = useNavigate();
 
   const handleDelete = async (id) => {
@@ -16,13 +44,12 @@ const Home = () => {
     if (!confirmed) return;
 
     try {
-      setLoadingTable(true); // show loading on table
+      setLoadingTable(true);
       await deleteStudent(id);
 
-      // simulate short delay for better UX
       setTimeout(() => {
         toast.success("Student deleted successfully!");
-        setLoadingTable(false); // hide spinner
+        setLoadingTable(false);
       }, 1000);
     } catch (err) {
       console.error(err);
@@ -79,7 +106,16 @@ const Home = () => {
     },
   ];
 
-  return !loading && (
+  // Show full-page spinner when initial data is loading
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen w-screen">
+        <Spinner size={100} color="#6366f1" />
+      </div>
+    );
+  }
+
+  return (
     <div className="p-4 max-w-7xl mx-auto relative">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -92,11 +128,11 @@ const Home = () => {
         </button>
       </div>
 
-      {/* Table container with relative position */}
+      {/* Table container */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden relative">
         {loadingTable && (
           <div className="absolute inset-0 bg-white bg-opacity-40 flex justify-center items-center z-50">
-            <LoadingRing size={60} color="red" />
+            <Spinner size={60} color="#ef4444" />
           </div>
         )}
         <DataTable
