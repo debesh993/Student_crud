@@ -79,7 +79,7 @@ const Home = () => {
     },
   ];
 
-  return loading && (
+  return !loading && (
     <div className="p-4 max-w-7xl mx-auto relative">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
